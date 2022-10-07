@@ -44,12 +44,11 @@ INSTALLED_APPS = [
     #local apps
     'rest_framework',
     'authentication',
-
-    #3rd party
-    'django_extensions', 
+    'social_auth',
 ]
 
 AUTH_USER_MODEL = 'authentication.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -110,6 +109,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'authentication.jwt.JWTAuthentication',
+    ],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

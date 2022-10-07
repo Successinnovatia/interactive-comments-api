@@ -1,0 +1,8 @@
+[run]
+source = authentication/, comments/,
+
+omit = 
+    env
+    */migrations/*
+    */tests/*
+    */__init__.py/*

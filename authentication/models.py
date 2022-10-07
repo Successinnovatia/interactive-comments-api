@@ -7,9 +7,12 @@ from django.utils import timezone
 from django.conf import settings
 from datetime import datetime, timedelta
 from .managers import MyUserManager
+import jwt
 
 
 
+
+AUTH_PROVIDERS = {'google': 'google','github':'github','email': 'email'}
 
 class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
     """
@@ -31,10 +34,10 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
         validators=[username_validator],
         error_messages={
             "unique": _("A user with that username already exists."),
-        },
+        }, db_index = True
     )
     
-    email = models.EmailField(_("email address"), blank=False, unique=True)
+    email = models.EmailField(_("email address"), blank=False, unique=True, db_index = True)
 
     is_staff = models.BooleanField(
         _("staff status"),
@@ -53,6 +56,10 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
 
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
+    auth_provider = models.CharField(
+        max_length=255, blank=False,
+        null=False, default=AUTH_PROVIDERS.get('email'))
+
     
 
     objects = MyUserManager()
@@ -60,3 +67,8 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
+
+    @property
+    def token (self):
+        token = jwt.encode({'username':self.username, 'email':self.email, 'exp':datetime.utcnow()+timedelta(23)}, settings.SECRET_KEY, algorithm = 'HS256')
+        return token
